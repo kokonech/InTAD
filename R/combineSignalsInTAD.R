@@ -2,7 +2,8 @@
 #'
 #' This function collects all genes for signal genomic region inside of
 #' Topologically Associated Domains (TADs)
-#' @param sGR Signal genomic region
+#' @param id Id of signal from the list
+#' @param sigList List of signal GRs and their names
 #' @param tadGR TAD genomic regions
 #' @param tss Gene transcription start sites
 #' @param pickMaxOvlp Use TAD with max overlap
@@ -14,9 +15,11 @@
 #'
 #' @return Data.frame containing genes connected to signal
 #'
-fnSE <- function(sGR, tadGR, tss,  pickMaxOvlp, nearestTad) {
+fnSE <- function(id, sigList, tadGR, tss,  pickMaxOvlp, nearestTad) {
 
-    #message(paste("Checking peak...", sGR))
+    sGR <- sigList[[id]]
+    sName <- names(sigList)[id]
+    #message(paste("Checking peak...", sName, sGR))
     ov1 <- findOverlaps(query=sGR, subject=tadGR)
     if (length(subjectHits(ov1)) == 0) {
         return(NULL)
@@ -26,7 +29,7 @@ fnSE <- function(sGR, tadGR, tss,  pickMaxOvlp, nearestTad) {
         #message(paste("Overlapping:",sGR) )
         temp <- tadGR[subjectHits(ov1),]
         intsW <- NULL
-        for(k in 1:length(start(temp))) {
+        for(k in seq_len(start(temp))) {
             ints <- intersect(sGR,temp[k,])
             intsW[k] <- width(ints)
         }
@@ -37,7 +40,7 @@ fnSE <- function(sGR, tadGR, tss,  pickMaxOvlp, nearestTad) {
 
     if (is.null(nearestTad)) {
         ovTss <- findOverlaps(query=tss, subject=ovTad, type="within")
-        dattab <- data.frame(peakid=rep(names(sGR),length(queryHits(ovTss))),
+        dattab <- data.frame(peakid=rep(sName,length(queryHits(ovTss))),
             geneid=values(tss)$geneid[queryHits(ovTss)],
             names=names(tss)[queryHits(ovTss)],
             tad=names(ovTad[subjectHits(ovTss)]),
@@ -47,7 +50,7 @@ fnSE <- function(sGR, tadGR, tss,  pickMaxOvlp, nearestTad) {
         closestGenes <- nearestTad[nearestTad$TAD %in% names(ovTad),,drop=FALSE]
         geneSel <- tss [ closestGenes$Gene ]
 
-        dattab <- data.frame(peakid=rep(names(sGR),nrow(closestGenes)),
+        dattab <- data.frame(peakid=rep(sName,nrow(closestGenes)),
             geneid=geneSel$geneid,names=names(geneSel),tad=closestGenes$TAD,
             stringsAsFactors = FALSE)
 
@@ -78,7 +81,7 @@ fnSE <- function(sGR, tadGR, tss,  pickMaxOvlp, nearestTad) {
 #'
 #' @importMethodsFrom GenomicRanges intersect
 #' @importFrom BiocGenerics start end
-#' @importFrom S4Vectors queryHits subjectHits
+#' @importFrom S4Vectors queryHits subjectHits getListElement
 #' @importFrom IRanges IRanges
 #' @import graphics
 #'
@@ -120,15 +123,19 @@ combineInTAD <- function( object, tadGR, selMaxTadOvlp = TRUE,
         colnames(nearestTad) <- c("Gene", "TAD")
     }
 
+    # fix issue with list
+    sigGR <- rowRanges(object@sigMAE[["signals"]])
+    sigList <- as( sigGR, "GRangesList")
+
     if (object@ncore > 1 && requireNamespace("parallel") ) {
         message("Running in parallel...")
         object@signalConnections <-
-            parallel::mclapply( rowRanges(object@sigMAE[["signals"]]),
-                                fnSE, tadGR, tss, selMaxTadOvlp,nearestTad )
+            parallel::mclapply( seq_along(sigList), fnSE,
+                                sigList, tadGR, tss, selMaxTadOvlp,nearestTad )
     } else {
         object@signalConnections <-
-            lapply( rowRanges(object@sigMAE[["signals"]]),
-                    fnSE, tadGR, tss, selMaxTadOvlp, nearestTad)
+            lapply( seq_along(sigList),fnSE,
+                    sigList, tadGR, tss, selMaxTadOvlp, nearestTad)
     }
     names(object@signalConnections) <- names(object@sigMAE[["signals"]])
 

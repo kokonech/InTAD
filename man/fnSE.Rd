@@ -4,10 +4,12 @@
 \alias{fnSE}
 \title{Preparation for correlation analysis for a signal}
 \usage{
-fnSE(sGR, tadGR, tss, pickMaxOvlp, nearestTad)
+fnSE(id, sigList, tadGR, tss, pickMaxOvlp, nearestTad)
 }
 \arguments{
-\item{sGR}{Signal genomic region}
+\item{id}{Id of signal from the list}
+
+\item{sigList}{List of signal GRs and their names}
 
 \item{tadGR}{TAD genomic regions}
 

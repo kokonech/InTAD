@@ -114,7 +114,7 @@ plotCorAcrossRef <- function( obj, corRes, targetRegion,
     if (!is(targetRegion, "GRanges"))
         stop("Target region must be GRanges")
 
-    if (sum( colnames(corRes)[1:3]  == c("peakid","tad","gene")) != 3)
+    if (sum( colnames(corRes)[seq_len(3)]  == c("peakid","tad","gene")) != 3)
         stop("Incorrect correlation table! Expected first 3 table
             column names: peakid, tad, gene")
 

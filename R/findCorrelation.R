@@ -5,7 +5,7 @@ findGeneCorrelation <- function(x, signalVals, countVals, corMethod) {
     #print(pId)
 
     corDat <- list()
-    for (i in 1:length(genes)) {
+    for (i in seq_len(length(genes))) {
         if (! (as.character(genes[i]) %in% row.names(countVals))) {
             #print(paste("NOT FOUND!", genes[i]))
             next
@@ -80,7 +80,7 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
     allRes <- lapply(allRes, function(x) na.omit(x))
 
     allX <- list()
-    for(i in 1:length(allRes)) {
+    for(i in seq_len(length(allRes))) {
         gnname <- values(txs)$gene_name[match(allRes[[i]]$gene,
                                             values(txs)$gene_id)]
         rnk <- allRes[[i]]$gene[order(allRes[[i]]$corr, decreasing=TRUE)]

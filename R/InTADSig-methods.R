@@ -55,7 +55,7 @@ newSigInTAD <- function(signalData = NULL,
         stop("geneRegions must be GRanges object!")
 
     if (is.null(sampleInfo)) {
-        sampleInfo <- DataFrame(Type=paste0("Sample", 1:ncol(signalData)),
+        sampleInfo <- DataFrame(Type=paste0("Sample",seq_len(ncol(signalData))),
                                 row.names=colnames(signalData))
     }
 
@@ -154,7 +154,7 @@ loadSigInTAD <- function(signalsFile,
 
     message("Loading signals...")
     sigtab <- read.delim(signalsFile)
-    if (sum(colnames(sigtab)[1:3] ==   c("chr","start","end")) != 3)
+    if (sum(colnames(sigtab)[seq_len(3)] ==   c("chr","start","end")) != 3)
         stop("First 3 columns of signal table should be genomic coordiantes
             with names \"chr\",\"start\",\"end\"!")
 
