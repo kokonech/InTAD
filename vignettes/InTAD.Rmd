@@ -1,0 +1,268 @@
+---
+title: "Correlation of epigenetic signals and genes in TADs"
+author:
+- name: Konstantin Okonechnikov
+  affiliation: German Cancer Research Center (DKFZ), Heidelberg, Germany
+output: 
+    BiocStyle::html_document
+abstract: |
+  The InTAD package is focused on the detection of correlation between expressed
+  genes and selected epigenomic signals i.e. enhancers within topologically 
+  associated domains (TADs). For this task coordinates of known publicly 
+  avialable TADs can be used due to their stability across cell types. 
+  Additionally novel TADs detected using HiC technology can be also applied to 
+  strengthen the specificity.
+  The InTAD analysis procedure starts from collecting 
+  signals and genes lying in the same TAD. Then the combined groups in a TAD 
+  are analyzed to detect correlations among them. Various parameters can be 
+  further controlled. For example, the gene expression filters, correlation 
+  methods (Pearson, Spearman), statistical limits (q-value computation), etc. 
+  The connection to TADs can be also expanded to find correlation with closest 
+  gene outside of a TAD. Multiple analysis steps include generation of special
+  plots for results visualization.
+vignette: |
+  %\VignetteIndexEntry{Correlation of epigenetic signals and genes in TADs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction 
+
+The InTAD analysis is focused on the processing of generated object that 
+combines all input datasets. Required input data is the following:
+
+* epigenetic signals data.frame i.e. enhancers along with their coordinates in 
+GRanges format 
+* gene expression counts data.frame along with gene coordinates 
+in GRanges format
+* TAD borders GRanges i.e. result of HiC technique application
+
+Further explained example of performing the analysis procedure is based on 
+H3K27ac data reflecting activity of enhancers in medulloblastoma brain tumour 
+descrbied in the manuscript from [C.Y.Lin, S.Erkek et al., Nature, 
+2016.](http://www.nature.com/nature/journal/v530/n7588/full/nature16546.html)
+
+This dataset includes normalized enhancer signals obtained from H3K27ac 
+ChIP-seq data and RNA-seq gene expression RPKM counts from 25  medulloblastoma 
+samples. The test subset is extracted from a selected region inside 
+chromosome 15. Additionally, the coordinates for enhancers and genes along 
+with specific sample annotation are provided. 
+
+The analysis starts from preparing and loading the data. Here is the 
+overview of integrated input test data, that can serve as a useful example 
+describing supported input formats:
+
+```{r quick-start,  message=FALSE, warning=FALSE}
+library(InTAD)
+# normalized enhancer signals table
+enhSel[1:3,1:3]
+# enhancer signal genomic coordinates 
+as.data.frame(enhSelGR[1:3])
+# gene expression normalized counts
+rpkmCountsSel[1:3,1:3]
+# gene coordiantes
+as.data.frame(txsSel[1:3])
+# additional sample info data.frame
+head(mbAnnData)
+```
+
+Importantly, there are specific requriements for the input datasets. The names 
+of samples should match in signals and gene expression datasets. 
+```{r input-check1,  warning=FALSE}
+summary(colnames(rpkmCountsSel) == colnames(enhSel))
+```
+Next, the genomic regions should be provided for each signal as well as for 
+each gene. 
+```{r input-check2,  warning=FALSE}
+# compare number of signal regions and in the input table
+length(enhSelGR) == nrow(enhSel)
+```
+The genomic regions reflecting the gene coordinates must include *"gene_id"* 
+and *"gene_name"* marks. These are typical GTF format markers. One more mark 
+*"gene_type"* is also useful to perform filtering of gene expression matrix.  
+
+All the requirements are checked during the generation of the **InTADSig** 
+object. Main part of this object is `r Biocpkg("MultiAssayExperiment")` subset 
+that combines signals and gene expression. Specific annotation information 
+about samples can be also included for further control and visualization. In 
+provided example for medulloblastoma samples annotation contains various 
+aspects such as tumour subgroup, age, gender, etc.
+
+```{r test,  warning=FALSE}
+inTadSig <- newSigInTAD(enhSel, enhSelGR, rpkmCountsSel, txsSel,mbAnnData)
+```
+The created object contains MultiAssayExperiment that includes both signals and 
+gene expression data. 
+
+```{r test2,  warning=FALSE}
+inTadSig
+```
+
+During the main object generation there are also available special options to 
+activate parallel computing based on usage of R multi-thread librares  
+and log2 adjustment for gene expression. The generated data subsets can be 
+accessed using specific call functions on the object i.e. *signals* or *exprs*. 
+
+Notably, the main object can be also loaded from the text files representing 
+the input data using function *loadSigInTAD*. Refer to the documetation of this 
+function for more details.
+
+# Main data analysis
+
+Before starting the analysis it's possible to adjust gene expression limits 
+using function *filterGeneExpr*. This function provides parameters to control 
+minimum gene expression and type. There is additionally a special option to 
+compute gene expression distribution based on usage of `r CRANpkg("mclust")` 
+package in order to find suitable minimum gene expression cut limit. 
+Here's example how to activate this:
+
+```{r filter-genes,  warning=FALSE}
+# filter gene expression
+inTadSig <- filterGeneExpr(inTadSig, checkExprDistr = TRUE)
+```
+
+The analysis starts from the combination of signals and genes inside the TADs. 
+Since the TADs are known to be stable across various cell types, it's possible 
+to use already known TADs obtained from IMR90 cells using HiC technology 
+([Dixon et al 2012](https://www.nature.com/articles/nature11082)). The human 
+IMR90 TADs regions object is integrated into the package. 
+```{r tad1,  warning=FALSE}
+# IMR90 hg19 TADs
+head(tadGR)
+```
+However, since the variance is actually observed between TAD calling methods 
+(i.e. described in detailed review by [Rola Dali and Mathieu Blanchette, NAR
+2017](https://academic.oup.com/nar/article/45/6/2994/3059658) ), novel obtained 
+TADs can be also applied for the analysis. The requried format: GRanges object. 
+
+Composition of genes and signals in TADs is performed using function 
+*combineInTAD* that has several options. By default, it marks the signal 
+belonging to the TAD by largest overlap and also takes into account genes that 
+are not overlaping the TADs by connecting them to the closest TAD. This can be 
+sensetive strategy since some genomic regions can be missed due to the limits 
+of input HiC data and variance of existing TAD calling methods. 
+
+```{r tad2,  warning=FALSE}
+# combine signals and genes in TADs
+inTadSig <- combineInTAD(inTadSig, tadGR)
+```
+
+Final step is the correlation analysis. Various options are avialble for this 
+function i.e. correlation method, computation of q-value to control the 
+evidence strength and visualization of connection proportions. This last option 
+allows to show differences in gene and signal regulations.
+```{r cor,  warning=FALSE}
+par(mfrow=c(1,2)) # option to combine plots in the graph
+# perform correlation anlaysis
+corData <- findCorrelation(inTadSig,plot.proportions = TRUE)
+```
+
+The result data.frame has a special format. It includes each signal, TAD, gene 
+and correlation information.
+```{r cor2,  warning=FALSE}
+head(corData,5)
+```
+Further filtering of this result data can be performed by adjusting p-value and 
+correlation effect limits (i.e. p-val < 0.01, positive correlation only). 
+
+# Visualization 
+
+The package provides post-analysis visualization function: the specific signal 
+and gene can be selected for correlation plot generation. Here's example of 
+verified medulllobastoma Group3-specifc enhancer assoicated gene GABRA5 lying 
+in the same TAD as the enhancer, but not close to the gene:
+
+
+```{r plot0, warning=FALSE}
+
+# example enhancer in correlation with GABRA5
+cID <- "chr15:26372163-26398073" 
+selCorData <- corData[corData$peakid == cID, ]
+selCorData[ selCorData$name == "GABRA5", ] 
+```
+
+For the plot generation it is required to provide the signal id and gene name:
+
+```{r plot1,fig.align = "center", warning=FALSE}
+
+plotCorrelation(inTadSig, cID, "GABRA5",
+                xLabel = "RPKM gene expr log2",
+                yLabel = "H3K27ac enrichment log2", 
+                colByPhenotype = "Subgroup")
+```
+
+Note that in the visualization it's also possible to mark the colours 
+representing the samples using option *colByPhenotype* based on the sample 
+annotation information included in the generation of the main object. In the 
+provided example medulloblastma tumour subgroups are marked.
+
+Specific genomic region of interest can be also visualised to observe the 
+variance and impact of TADs using special function that works on result 
+data.frame obtained from function *findCorrelation*. The resulting plot 
+provides the location of signals in X-axis and genes in Y-axis. Each point 
+reflects the correlation stength based on p-value: *-log10(P-val)*. This 
+visualization strategy was introduced in the study by [S. Waszak et al, Cell, 
+2015](https://www.sciencedirect.com/science/article/pii/S0092867415009770) 
+focused on investigation of chromatin architecture in human cells. 
+
+By default only detected TADs  with signals inside are visualized, 
+but it is also possible to include all avaialble TAD regions using special 
+option. Here's the example plot covering the whole chromosome 15 region used
+in the test dataset: 
+
+```{r plot3, fig.align = "center", warning=FALSE}
+plotCorAcrossRef(inTadSig,corData,
+                 targetRegion = GRanges("chr15:25000000-28000000"), 
+                 tads = tadGR)
+```
+
+One more option of this function allows to activaite representation of postive
+correlation values from 0 to 1 instead of strength.
+
+```{r plot4, fig.align = "center", warning=FALSE}
+plotCorAcrossRef(inTadSig,corData,
+                 targetRegion = GRanges("chr15:25000000-28000000"), 
+                 showCorVals = TRUE, tads = tadGR)
+```
+
+This visualization strategy allows to investigate the impact of TADs and 
+focus on connections specific for the target cell type.
+
+Additional documentation is available for each function via standard R help.
+
+# Session info 
+
+Here is the output of `sessionInfo()` on the system on which this
+document was compiled:
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+
+# References
+
+*[Dali, R. and Blanchette, M., 2017. A critical assessment of topologically 
+associating domain prediction tools. Nucleic acids research, 45(6),
+pp.2994-3005.](https://academic.oup.com/nar/article/45/6/2994/3059658)*
+
+*[Dixon, J.R., Selvaraj, S., Yue, F., Kim, A., Li, Y., Shen, Y., Hu, M., 
+Liu, J.S. and Ren, B., 2012. Topological domains in mammalian genomes
+identified by analysis of chromatin interactions. Nature, 485(7398),
+p.376.](https://www.nature.com/articles/nature11082)*
+
+*[Lin, C.Y., Erkek, S., Tong, Y., Yin, L., Federation, A.J., Zapatka, M., 
+Haldipur, P., Kawauchi, D., Risch, T., Warnatz, H.J. and Worst, B.C., 2016. 
+Active medulloblastoma enhancers reveal subgroup-specific cellular origins. 
+Nature, 530(7588), 
+p.57.](http://www.nature.com/nature/journal/v530/n7588/full/nature16546.html)*
+
+*[Waszak, S.M., Delaneau, O., Gschwind, A.R., Kilpinen, H., Raghav, S.K., 
+Witwicki, R.M., Orioli, A., Wiederkehr, M., Panousis, N.I., Yurovsky, A. 
+and Romano-Palumbo, L., 2015. Population variation and genetic control  
+of modular chromatin architecture in humans. Cell, 
+162(5)](https://www.sciencedirect.com/science/article/pii/S0092867415009770)*
+

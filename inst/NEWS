@@ -1,0 +1,29 @@
+VERSION 0.99.0
+-------------
+
+    * Prepare for bioconductor sumbission
+
+
+VERSION 0.3.0
+-------------
+
+    * Novel plotCorAcrossRef integration
+    * Add q-value estimation option
+    * Allow including annotation to MultiAssayExperiment 
+    * Major documentaiton update
+
+
+VERSION 0.2.1
+-------------
+   
+    * Main update:  MultiAssayExperiment data integration
+    * Switch to gene coordinates by default 
+    * Default option to find genes closest to TAD
+ 
+
+VERSION 0.1.1
+-------------
+   
+    * First implementation
+    
+
