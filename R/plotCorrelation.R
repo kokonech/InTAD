@@ -10,6 +10,7 @@
 #' that can be use for colour
 #' @param corMethod Correlation method. Default: Pearson
 #' @importFrom stats cor
+#' @importFrom Biobase exprs
 #' @import ggpubr
 #' @import ggplot2
 #' @return A \code{ggplot} object for visualization or customization.
@@ -143,6 +144,7 @@ plotCorAcrossRef <- function( obj, corRes, targetRegion,
     } else {
         res <- cbind(start(sigSel), end(sigSel),
                    start(geneSel), end(geneSel),
+                   # TODO: log2Pval + 1!!!
                    -log10(corSel2$pvalue))
 
     }

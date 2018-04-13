@@ -124,10 +124,6 @@ setMethod('sigCoords', 'InTADSig',
             function(object) rowRanges(object@sigMAE[["signals"]]))
 
 
-#' @rdname exprs
-#' @export
-setGeneric('exprs', function(object) standardGeneric('exprs'))
-
 #' Gene expression counts table
 #'
 #' This funcion returns gene expression counts table
@@ -138,7 +134,8 @@ setGeneric('exprs', function(object) standardGeneric('exprs'))
 #' inTadSig <- newSigInTAD(enhSel, enhSelGR, rpkmCountsSel, txsSel)
 #' head(exprs(inTadSig))
 #' @export
-setMethod('exprs', 'InTADSig', function(object) assay(object@sigMAE[["exprs"]]))
+setMethod('exprs', signature='InTADSig',
+          definition=function(object) assay(object@sigMAE[["exprs"]]))
 
 # get pairs in TADs
 setGeneric('sigLinks', function(object) standardGeneric('sigLinks'))
