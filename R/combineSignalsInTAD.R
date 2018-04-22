@@ -29,7 +29,7 @@ fnSE <- function(id, sigList, tadGR, tss,  pickMaxOvlp, nearestTad) {
         #message(paste("Overlapping:",sGR) )
         temp <- tadGR[subjectHits(ov1),]
         intsW <- NULL
-        for(k in seq_len(start(temp))) {
+        for(k in 1:length(temp)) {
             ints <- intersect(sGR,temp[k,])
             intsW[k] <- width(ints)
         }

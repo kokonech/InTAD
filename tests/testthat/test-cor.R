@@ -67,6 +67,34 @@ test_that("combine intad options are working correctly", {
 
 })
 
+test_that("check intad selMaxTadOvlp option", {
+    data("mbSelEnhSignals")
+    data("enhSelCoords")
+    data("mbSamplesRPKM")
+    data("txsSel")
+
+    # novel enhnacer overlapping 2 tads
+    # std tad chr15:25728907-27128907, close tad chr15:23608559-25368907
+    novEnh <- "chr15:25367907-25738907"
+    enhSel2 <- rbind(enhSel, c(rep(1, 20),rep(2,5)))
+    rownames(enhSel2)[66] <-  novEnh
+    enhSelGR2 <- c(enhSelGR,GRanges(novEnh))
+
+    inTadSig <- newSigInTAD(enhSel2, enhSelGR2, rpkmCountsSel, txsSel)
+
+    inTadSig <- filterGeneExpr(inTadSig, checkExprDistr = TRUE)
+
+    # combine genes and signals in TAD: default largest overlap
+    inTadSig <- combineInTAD(inTadSig, tadGR)
+    expect_equal( length(inTadSig@signalConnections[[novEnh]]$tad) , 8)
+
+    # combine enh with both TADs
+    inTadSig <- combineInTAD(inTadSig, tadGR,selMaxTadOvlp = FALSE)
+    expect_equal( length(inTadSig@signalConnections[[novEnh]]$tad) , 68)
+
+
+})
+
 
 
 
