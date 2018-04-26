@@ -1,7 +1,15 @@
-VERSION 0.99.0
--------------
+VERSION 0.99.1-4
+----------------
 
-    * Prepare for bioconductor sumbission
+    * Package accepted in Bioconductor
+    * Adjustment for R version 3.5
+    * Minor fixes
+    
+
+VERSION 0.99.0
+--------------
+
+    * Prepare for Bioconductor sumbission
 
 
 VERSION 0.3.0

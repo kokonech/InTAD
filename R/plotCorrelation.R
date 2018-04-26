@@ -93,6 +93,7 @@ plotCorrelation <- function( obj, sId, geneName,
 #' @param targetRegion Target genomic region visualise.
 #' @param showCorVals Use this option to visualize postive correlation values
 #' instead of correlation strength
+#' @param symmetric Activate mirrow symmetry for gene-signal connections
 #' @param tads TAD regions to visualize. By default only TADs persent in
 #' correlation result table are applied (NULL value).
 #'
@@ -106,7 +107,7 @@ plotCorrelation <- function( obj, sId, geneName,
 #'
 #' @export
 plotCorAcrossRef <- function( obj, corRes, targetRegion,
-                              showCorVals = FALSE,
+                              showCorVals = FALSE, symmetric= FALSE,
                               tads = NULL) {
 
     if (!is(obj, "InTADSig"))
@@ -144,17 +145,28 @@ plotCorAcrossRef <- function( obj, corRes, targetRegion,
     } else {
         res <- cbind(start(sigSel), end(sigSel),
                    start(geneSel), end(geneSel),
-                   # TODO: log2Pval + 1!!!
-                   -log10(corSel2$pvalue))
+                   -log10(corSel2$pvalue + 1e-09))
 
     }
 
     # start position version
     dt <- as.data.frame(res[,c(1,3,5)])
-    colnames(dt) <- c("enh","gene","cor")
     if (showCorVals) {
-      dt <- dt[dt$cor > 0, ]
+      dt <- dt[dt[,3] > 0, ]
     }
+
+    xLab = "Signal coords (bp)"
+    yLab = "Gene coords (bp)"
+
+    if (symmetric) {
+      xLab = "Genomic coords (bp)"
+      yLab = "Genomic coords (bp)"
+      t2 <- cbind(t(apply(dt[,1:2], 1, sort)),dt[,3])
+      t3 <- t2[,c(2,1,3)]
+      dt <- as.data.frame(rbind(t2,t3))
+    }
+
+    colnames(dt) <- c("enh","gene","cor")
 
     if (nrow(dt) == 0)
         stop("No correlation between signal and genes
@@ -169,7 +181,7 @@ plotCorAcrossRef <- function( obj, corRes, targetRegion,
     sp <- ggplot( dt, aes_string(x="enh",y="gene",color="cor")) +
         geom_point() + labs(color=legendLab) +
         labs(title = paste("Region",as.character(targetRegion)),
-            x = "Signal coords (bp)", y="Gene coords (bp)") +
+            x = xLab, y= yLab) +
         theme(plot.title = element_text(hjust = 0.5)) +
         expand_limits( x=c(start(targetRegion), end(targetRegion)),
                     y=c(start(targetRegion), end(targetRegion))) +

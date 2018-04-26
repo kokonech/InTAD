@@ -229,8 +229,18 @@ plotCorAcrossRef(inTadSig,corData,
                  showCorVals = TRUE, tads = tadGR)
 ```
 
-This visualization strategy allows to investigate the impact of TADs and 
-focus on connections specific for the target cell type.
+It's also possible to focus on the connections by ignoring the signal/gene 
+locations and focusing only on correlation values by adjusting for symmetery.
+This is typical approach used for HiC contact data visualization in such 
+tools as for example [JuiceBox](http://aidenlab.org/juicebox/). This can be activate by using the corresponding option:
+
+```{r plot5, fig.align = "center", warning=FALSE}
+plotCorAcrossRef(inTadSig,corData,
+                 targetRegion = GRanges("chr15:25000000-28000000"), 
+                 showCorVals = TRUE, symmetric = TRUE, tads = tadGR)
+```
+
+These visualization strategies allow to investigate the impact of TADs.
 
 Additional documentation is available for each function via standard R help.
 
@@ -262,7 +272,6 @@ p.57.](http://www.nature.com/nature/journal/v530/n7588/full/nature16546.html)*
 
 *[Waszak, S.M., Delaneau, O., Gschwind, A.R., Kilpinen, H., Raghav, S.K., 
 Witwicki, R.M., Orioli, A., Wiederkehr, M., Panousis, N.I., Yurovsky, A. 
-and Romano-Palumbo, L., 2015. Population variation and genetic control  
-of modular chromatin architecture in humans. Cell, 
+and Romano-Palumbo, L., 2015. Population variation and genetic control of modular chromatin architecture in humans. Cell, 
 162(5)](https://www.sciencedirect.com/science/article/pii/S0092867415009770)*
 

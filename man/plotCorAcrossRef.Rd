@@ -5,7 +5,7 @@
 \title{Function to plot correlation across genome}
 \usage{
 plotCorAcrossRef(obj, corRes, targetRegion, showCorVals = FALSE,
-  tads = NULL)
+  symmetric = FALSE, tads = NULL)
 }
 \arguments{
 \item{obj}{InTADSig object with signals and genes combined in TADS}
@@ -16,6 +16,8 @@ plotCorAcrossRef(obj, corRes, targetRegion, showCorVals = FALSE,
 
 \item{showCorVals}{Use this option to visualize postive correlation values
 instead of correlation strength}
+
+\item{symmetric}{Activate mirrow symmetry for gene-signal connections}
 
 \item{tads}{TAD regions to visualize. By default only TADs persent in
 correlation result table are applied (NULL value).}
