@@ -4,4 +4,7 @@ The main target of the package is to detect correlation between gene expression 
 
 The analysis starts from collecting signals and genes lying in the same TAD. Then the combined groups in a TAD are analyzed to detect correlations among them. Various parameters can be further controlled. For example, the expression filters, correlation limits (positive,negative), methods (Pearson, Spearman), etc. Each step also provides specific visualization plots.
 
+Package is avialable at BioConductor:
+http://bioconductor.org/packages/release/bioc/html/InTAD.html 
+
 For more details please refer to the main vignette and documentation.
