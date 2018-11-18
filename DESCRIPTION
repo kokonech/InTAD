@@ -1,7 +1,7 @@
 Package: InTAD
 Type: Package
 Title: Search for correlation between epigenetic signals and gene expression in TADs
-Version: 1.1.0
+Version: 1.3.0
 Author: Konstantin Okonechnikov, Serap Erkek, Lukas Chavez
 Maintainer: Konstantin Okonechnikov <k.okonechnikov@gmail.com>
 Description: The package is focused on the detection of correlation between expressed genes and selected epigenomic signals i.e. enhancers obtained from ChIP-seq data within topologically associated domains (TADs). Various parameters can be controlled to investigate the influence of external factors and visualization plots are available for each analysis step.  
