@@ -29,29 +29,24 @@ plotCorrelation <- function( obj, sId, geneName,
     if (!is(obj, "InTADSig"))
         stop("Object must be an InTADSig!")
 
-    if (length(obj@signalConnections)  == 0)
-        stop("No signals and genes are combined in TAD!
-            Use combineInTAD() function")
+    # TODO: add option about TADs only as it was previously?
 
     if (nchar(colByPhenotype) > 0) {
         if (!( colByPhenotype %in% colnames(colData(obj@sigMAE))) )
             stop(paste0("Phenotype ", colByPhenotype," is not found!"))
     }
 
-    allIdGnX <- obj@signalConnections
-
-    if (!sId %in% names(allIdGnX)  ) {
+    if (!sId %in% rownames(signals(obj)) ) {
         stop("Signal is not found!")
     }
 
-    selSig <- allIdGnX[[sId]]
-
-    if (!geneName %in% selSig$names) {
-        stop(sprintf("The gene %s is not in the
-                    same TAD as signal %s", geneName, sId))
+    ann <- geneCoords(obj)
+    if (!geneName %in% ann$gene_name) {
+      stop("Gene name not found!")
     }
-    geneId <- selSig[selSig$names == geneName,]$geneid
+    geneId <- ann[ann$gene_name == geneName]$gene_id
 
+    message(geneId)
     toPlot<-data.frame(
         sig = signals(obj)[row.names(signals(obj))==sId, ],
         exp = exprs(obj)[row.names(exprs(obj))==geneId, ]
