@@ -18,8 +18,9 @@ findGeneCorrelation <- function(x, signalVals, countVals, corMethod) {
         }
         sigSel = as.numeric(signalVals[pId,])
         cors <- suppressWarnings(cor.test( sigSel, countSel, method=corMethod))
-
-        corDat[[i]] <- data.frame(gene=genes[i], corr=cors$estimate,
+        euDis = as.numeric(dist(rbind ( sigSel, countSel)))
+        corDat[[i]] <- data.frame(gene=genes[i], eudis= euDis,
+                                corr=cors$estimate,
                                 pvalue=cors$p.value,
                                 stringsAsFactors =FALSE)
     }
@@ -35,8 +36,9 @@ findGeneCorrelation <- function(x, signalVals, countVals, corMethod) {
 #' @param method Correlation method: "pearson" (default), "kendall", "spearman"
 #' @param adj.pval Perform p-value adjsutment and include q-values in result
 #' @param plot.proportions Plot proportions of signals and genes in correlation
-#' @return A table with correlation values for signal-gene pairs
-#' @importFrom stats na.omit cor.test
+#' @return A table with correlation values for signal-gene pairs including
+#' correlation p-value, euclidian distance and rank.
+#' @importFrom stats na.omit cor.test dist
 #' @import qvalue
 #' @export
 #' @examples
@@ -94,6 +96,7 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
                             gene=allRes[[i]]$gene, name=gnname,
                             cor=allRes[[i]]$corr,
                             pvalue=allRes[[i]]$pvalue,
+                            eucDist = allRes[[i]]$eudis,
                             corRank=corRank,
                             stringsAsFactors =FALSE)
     }
@@ -103,7 +106,7 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
     if (adj.pval) {
         qvals <- qvalue(allCortab$pvalue)
         allCortab <- cbind(allCortab, qvals$qvalues)
-        colnames(allCortab)[8] <- "qvalue"
+        colnames(allCortab)[9] <- "qvalue"
     }
 
     if (plot.proportions) {

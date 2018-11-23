@@ -113,8 +113,7 @@ function for more details.
 
 # Main data analysis
 
-Before starting the analysis it's possible to adjust gene expression limits 
-using function *filterGeneExpr*. This function provides parameters to control 
+General first from gene expression counts matrix filtering with non- or low expressed genes. However if this counts were not filtered before starting the  InTAD analysis it's possible to adjust gene expression limits using function *filterGeneExpr*. This function provides parameters to control 
 minimum gene expression and type. There is additionally a special option to 
 compute gene expression distribution based on usage of `r CRANpkg("mclust")` 
 package in order to find suitable minimum gene expression cut limit. 

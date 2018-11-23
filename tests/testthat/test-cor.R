@@ -40,10 +40,15 @@ test_that("correlation properties are working correctly", {
     expect_equal( selCorData[ selCorData$name == "GABRA5","cor" ] , 0.8361538, tolerance=1e-6)
 
     corData <- findCorrelation(inTadSig, adj.pval = TRUE)
-    expect_equal( ncol(corData) , 8)
+    expect_equal( ncol(corData) , 9)
 
     selCorData <- corData[corData$peakid == cID, ]
+
     expect_equal( selCorData[ selCorData$name == "GABRA5","qvalue" ] , 6.276324e-06, tolerance=1e-6)
+
+    # novel option 18.11.2018
+    expect_equal( selCorData[ selCorData$name == "GABRA5","eucDist" ] , 10.92154 , tolerance=1e-6)
+
 
 
 })

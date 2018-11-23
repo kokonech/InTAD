@@ -17,7 +17,8 @@ findCorrelation(object, method = "pearson", adj.pval = FALSE,
 \item{plot.proportions}{Plot proportions of signals and genes in correlation}
 }
 \value{
-A table with correlation values for signal-gene pairs
+A table with correlation values for signal-gene pairs including
+correlation p-value, euclidian distance and rank.
 }
 \description{
 This function combines genes and signals in inside of TADs
