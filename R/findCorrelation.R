@@ -105,9 +105,9 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
 
     if (adj.pval) {
         qvals <- tryCatch({
-            qvalue(corData$pvalue)
+            qvalue(allCortab$pvalue)
         }, error = function(e) {
-            qvalue(corData$pvalue, pi0=1)
+            qvalue(allCortab$pvalue, pi0=1)
         })
         allCortab <- cbind(allCortab, qvals$qvalues)
         colnames(allCortab)[9] <- "qvalue"
