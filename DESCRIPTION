@@ -11,7 +11,7 @@ Depends: R (>= 3.5), methods, S4Vectors, IRanges, GenomicRanges,
         MultiAssayExperiment, SummarizedExperiment,stats
 Imports: BiocGenerics,Biobase,rtracklayer,parallel,graphics,mclust,qvalue, 
         ggplot2,utils,ggpubr
-biocViews: Epigenetics, Sequencing, ChIPSeq, RNASeq, HiC, GeneExpression
+biocViews: Epigenetics, Sequencing, ChIPSeq, RNASeq, HiC, GeneExpression,ImmunoOncology
 VignetteBuilder: knitr
 Suggests: testthat, BiocStyle, knitr, rmarkdown
 RoxygenNote: 6.0.1

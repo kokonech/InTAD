@@ -41,7 +41,7 @@ NULL
 #' @name tadGR
 #' @title Genomic coordiantes of topologically associated domains
 #' @description This GRanges object contains the coordinates of TADs
-#' revealed from IMR90 cell line
+#' revealed from IMR90 cell line (extracted from 0-indexed .bed file)
 #' @return NULL, but makes available the dataset
 #' @docType data
 #' @usage tadGR

@@ -13,5 +13,5 @@ NULL, but makes available the dataset
 }
 \description{
 This GRanges object contains the coordinates of TADs
-revealed from IMR90 cell line
+revealed from IMR90 cell line (extracted from 0-indexed .bed file)
 }
