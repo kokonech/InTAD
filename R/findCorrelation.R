@@ -104,7 +104,11 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
     allCortab <- do.call(rbind, lapply(allX, function(x) x))
 
     if (adj.pval) {
-        qvals <- qvalue(allCortab$pvalue)
+        qvals <- tryCatch({
+            qvalue(allCortab$pvalue)
+        }, error = function(e) {
+            qvalue(allCortab$pvalue, pi0=1)
+        })
         allCortab <- cbind(allCortab, qvals$qvalues)
         colnames(allCortab)[9] <- "qvalue"
     }
