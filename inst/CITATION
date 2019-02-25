@@ -3,9 +3,9 @@ citEntry(entry="article",
          author = "Konstantin Okonechnikov and Serap Erkek and Jan O. Korbel and Stefan M. Pfister and Lukas Chavez", 
          year = 2019,
          journal = "BMC bioinformatics",
-         doi = "https://doi.org/10.1186/s12859-019-2655-2",
+         doi = "10.1186/s12859-019-2655-2",
          volume = 20,
          issue = 1,
          pages = 60,
-         textVersion = "Okonechnikov, K., Erkek, S., Korbel, J.O., Pfister, S.M. and Chavez, L., 2019. InTAD: chromosome conformation guided analysis of enhancer target genes. BMC bioinformatics, 20(1), p.60."
+         textVersion = "Okonechnikov, K., Erkek, S., Korbel, J.O., Pfister, S.M. and Chavez, L., 2019. InTAD: chromosome conformation guided analysis of enhancer target genes. BMC Bioinformatics, 20(1), p.60."
 )
