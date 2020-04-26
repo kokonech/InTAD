@@ -102,6 +102,25 @@ test_that("check intad selMaxTadOvlp option", {
 
 
 
+test_that("check intad effect of no enhancers and TADs", {
+    data("mbSelEnhSignals")
+    data("enhSelCoords")
+    data("mbSamplesRPKM")
+    data("txsSel")
+
+    # edit enhancers to remove overlap with TADs
+    enhSelGR2 <- enhSelGR[1:2]
+    start(enhSelGR2) <- c(3000,5000)
+    end(enhSelGR2) <- c(4000,6000)
+
+    inTadSig <- newSigInTAD(enhSel[1:2,], enhSelGR2, rpkmCountsSel, txsSel)
+
+    expect_that(combineInTAD(inTadSig, tadGR),
+                throws_error("No overlaps found between signal regions and TADs!"))
+
+})
+
+
 
 
 

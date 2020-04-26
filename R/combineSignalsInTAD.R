@@ -107,6 +107,12 @@ combineInTAD <- function( object, tadGR, selMaxTadOvlp = TRUE,
     }
     # coords requrired
     geneGR <- rowRanges(object@sigMAE[["exprs"]])
+    sigGR <- rowRanges(object@sigMAE[["signals"]])
+
+    if (sum(countOverlaps(sigGR,tadGR)) == 0) {
+      stop("No overlaps found between signal regions and TADs!")
+    }
+
     tss <- GRanges( seqnames=as.character(seqnames(geneGR)),
                 IRanges(start=ifelse(as.character(strand(geneGR))=="+",
                 start(geneGR),end(geneGR)), width=1,
@@ -124,7 +130,6 @@ combineInTAD <- function( object, tadGR, selMaxTadOvlp = TRUE,
     }
 
     # fix issue with list
-    sigGR <- rowRanges(object@sigMAE[["signals"]])
     sigList <- as( sigGR, "GRangesList")
 
     if (object@ncore > 1 && requireNamespace("parallel") ) {
