@@ -19,6 +19,10 @@ are listed below.
        MultiAssayExperiment object containg signals and gene counts }
        \item{\code{signalConnections}:}{\code{"list"},
        The list of signals representing gene data frames in the same TAD }
+       \item{\code{loopsDf}:}{\code{"data.frame"},
+       The data.frame containing details of provided input loops }
+       \item{\code{loopConnections}:}{\code{"list"},
+       The list of connections between signals and genes via loops }
        \item{\code{ncore}:}{\code{"numeric"},
        Number of cores to use for parallel computing }#'
 }

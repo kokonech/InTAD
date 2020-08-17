@@ -19,7 +19,7 @@
 #
 #' @details
 #' InTADSig object stores matrices of signals and gene expression values along
-#' with coordinates. The samples order and names of columns should match in both
+#' with coordinates. The order of samples and names of columns should match in both
 #' datasets. For gene coordinates GRanges "gene_id" and "gene_name" are required
 #' in metadata. These are typical markers of genes in GTF anntotation format.
 #'

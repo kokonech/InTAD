@@ -2,7 +2,7 @@
 % Please edit documentation in R/findCorrelation.R
 \name{findCorrelation}
 \alias{findCorrelation}
-\title{Function to perfrom correlation analysis}
+\title{Function to perfrom correlation analysis in TADs}
 \usage{
 findCorrelation(object, method = "pearson", adj.pval = FALSE,
   plot.proportions = FALSE)

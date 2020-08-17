@@ -29,7 +29,7 @@ findGeneCorrelation <- function(x, signalVals, countVals, corMethod) {
 }
 
 
-#' Function to perfrom correlation analysis
+#' Function to perfrom correlation analysis in TADs
 #'
 #' This function combines genes and signals in inside of TADs
 #' @param object InTADSig object with signals and genes combined in TADS
