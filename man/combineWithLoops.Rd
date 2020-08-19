@@ -4,7 +4,8 @@
 \alias{combineWithLoops}
 \title{Preparation for correlation analysis via loops}
 \usage{
-combineWithLoops(object, loopsInitDf, fragmentLength = 0, extSize = 0)
+combineWithLoops(object, loopsInitDf, fragmentLength = 0, tssWidth = 2000,
+  extSize = 0)
 }
 \arguments{
 \item{object}{InTADSig object}
@@ -15,6 +16,9 @@ combineWithLoops(object, loopsInitDf, fragmentLength = 0, extSize = 0)
 \item{fragmentLength}{In case the input format is 4-column \emph{(chr1,middlePos1,
 chr2, middlePos2)} fragment length should be provided to extend the
 corresponding loci for loop start and end positions.}
+
+\item{tssWidth}{The transcription start site width is used to control overlaps
+with loop anchor. Default is 2000 base pairs.}
 
 \item{extSize}{The loop endings can be extended upstream and downstream
 with provided corresponding increase size in base pairs.}

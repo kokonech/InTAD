@@ -6,15 +6,10 @@ author:
 output: 
     BiocStyle::html_document
 abstract: |
-  The InTAD package is focused on the detection of correlation between expressed
-  genes and selected epigenomic signals i.e. enhancers within topologically 
-  associated domains (TADs). For this task coordinates of known publicly 
-  avialable TADs can be used due to their stability across cell types. 
-  Additionally novel TADs detected using HiC technology can be also applied to 
-  strengthen the specificity.
-  The InTAD analysis procedure starts from collecting 
-  signals and genes lying in the same TAD. Then the combined groups in a TAD 
-  are analyzed to detect correlations among them. Various parameters can be 
+  The InTAD package is focused on the detection of correlation between  expressed genes and selected epigenomic signals (i.e. enhancers) either within     topologically associated domains (TADs) or connected via chromatin loops. 
+  For the first task coordinates of known publicly avialable TADs can be used due to their stability across cell types. 
+  Additionally novel TADs and direct loops detected using HiC technology can be also applied to strengthen the specificity.
+  The InTAD analysis procedure starts from collecting signals and genes lying in the same TAD. Then the combined groups in a TAD are analyzed to detect correlations among them. Various parameters can be 
   further controlled. For example, the gene expression filters, correlation 
   methods (Pearson, Spearman), statistical limits (q-value computation), etc. 
   The connection to TADs can be also expanded to find correlation with closest 
@@ -111,7 +106,7 @@ Notably, the main object can be also loaded from the text files representing
 the input data using function *loadSigInTAD*. Refer to the documetation of this 
 function for more details.
 
-# Main data analysis
+# Main data analysis using TADs
 
 General first from gene expression counts matrix filtering with non- or low expressed genes. However if this counts were not filtered before starting the  InTAD analysis it's possible to adjust gene expression limits using function *filterGeneExpr*. This function provides parameters to control 
 minimum gene expression and type. There is additionally a special option to 
@@ -167,6 +162,16 @@ head(corData,5)
 ```
 Further filtering of this result data can be performed by adjusting p-value and 
 correlation effect limits (i.e. p-val < 0.01, positive correlation only). 
+
+# Integration of chromatin loops
+
+Another clear approach to find contacts between genes and epigenetic signals
+is to use direct chromatin connections, so called loops. The loops are also typically derived from HiC data and there are well-known tools that allow to perform this (e.g. [FitHiC](https://ay-lab.github.io/fithic/)).
+
+![Typical example of chromatin loops visualisation from IGV showing connection of medulloblastoma tumor specific enhancers to genes. The loops are derived from IMR90 HiC data.](figures/loops_image.png) 
+
+InTAD starting from version 1.9.1 also allows to integrate this result. Main functions to perform this task are  *combineWithLoops* and *findCorFromLoops*.
+
 
 # Visualization 
 

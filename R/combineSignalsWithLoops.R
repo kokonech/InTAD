@@ -9,6 +9,8 @@
 #' @param fragmentLength In case the input format is 4-column \emph{(chr1,middlePos1,
 #' chr2, middlePos2)} fragment length should be provided to extend the
 #' corresponding loci for loop start and end positions.
+#' @param tssWidth The transcription start site width is used to control overlaps
+#' with loop anchor. Default is 2000 base pairs.
 #' @param extSize The loop endings can be extended upstream and downstream
 #' with provided corresponding increase size in base pairs.
 #' @return Updated InTADSig object containing genes connected to signals
@@ -26,7 +28,9 @@
 #'
 #' @export
 #'
-combineWithLoops <- function( object, loopsInitDf, fragmentLength = 0,
+combineWithLoops <- function( object, loopsInitDf,
+                              fragmentLength = 0,
+                              tssWidth = 2000,
                               extSize = 0) {
 
     if (!is(object, "InTADSig"))
@@ -72,9 +76,10 @@ combineWithLoops <- function( object, loopsInitDf, fragmentLength = 0,
 
     tss <- GRanges( seqnames=as.character(seqnames(geneGR)),
                     IRanges(start=ifelse(as.character(strand(geneGR))=="+",
-                                         start(geneGR),end(geneGR)), width=1,
+                                         start(geneGR),end(geneGR)), width=tssWidth,
                             names=values(geneGR)$gene_name),
                     strand=strand(geneGR), geneid=values(geneGR)$gene_id )
+    tss <- shift(tss, -tssWidth/2)
 
     # overlaps with enhancers
     enhUpstream <- findOverlaps(regions1,sigGR)
