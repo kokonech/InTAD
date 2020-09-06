@@ -49,12 +49,22 @@ NULL
 NULL
 
 #' @name mbAnnData
-#' @title Data frame containing information about sampless
+#' @title Data frame containing information about samples
 #' @description The table includes additional informaiton about MB tumour
 #' samples (subgroup, gender, age, histology and M.Stage)
 #' @return NULL, but makes available the dataset
 #' @docType data
 #' @usage mbAnnData
+#' @format a data.frame object
+NULL
+
+#' @name loopsDfSel
+#' @title Data frame containing coordinates of loops
+#' @description The table contains genomic coordinates of chromatin loops
+#' in 6-column format derived from IMR90 cell line (focus : chr15)
+#' @return NULL, but makes available the dataset
+#' @docType data
+#' @usage loopsDfSel
 #' @format a data.frame object
 NULL
 

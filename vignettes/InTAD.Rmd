@@ -6,10 +6,12 @@ author:
 output: 
     BiocStyle::html_document
 abstract: |
-  The InTAD package is focused on the detection of correlation between  expressed genes and selected epigenomic signals (i.e. enhancers) either within     topologically associated domains (TADs) or connected via chromatin loops. 
+  The InTAD package is focused on the detection of correlation between  expressed genes and selected epigenomic signals (i.e. enhancers) either located within same topologically associated domains (TADs) or connected via chromatin loops. 
   For the first task coordinates of known publicly avialable TADs can be used due to their stability across cell types. 
-  Additionally novel TADs and direct loops detected using HiC technology can be also applied to strengthen the specificity.
-  The InTAD analysis procedure starts from collecting signals and genes lying in the same TAD. Then the combined groups in a TAD are analyzed to detect correlations among them. Various parameters can be 
+  Additionally novel TADs or direct loops detected using HiC technology can be applied to strengthen the specificity.
+  For the usage of TADs the analysis procedure starts from collecting signals and genes lying in the same TAD. Then the combined groups in a TAD are analyzed to detect correlations among them. 
+  For the usage of HiC loops the procedure starts from searching for connections between genes and target signals. Afterwards correlation is computed in similar manner as with TADs for each signal-gene pair.
+  Various parameters can be 
   further controlled. For example, the gene expression filters, correlation 
   methods (Pearson, Spearman), statistical limits (q-value computation), etc. 
   The connection to TADs can be also expanded to find correlation with closest 
@@ -30,11 +32,11 @@ knitr::opts_chunk$set(echo = TRUE)
 The InTAD analysis is focused on the processing of generated object that 
 combines all input datasets. Required input data is the following:
 
-* epigenetic signals data.frame i.e. enhancers along with their coordinates in 
+* epigenetic signals data.frame e.g. enhancers along with their coordinates in 
 GRanges format 
 * gene expression counts data.frame along with gene coordinates 
 in GRanges format
-* TAD borders GRanges i.e. result of HiC technique application
+* TAD borders GRanges or loops data.frame e.g. from results of HiC technique application
 
 Further explained example of performing the analysis procedure is based on 
 H3K27ac data reflecting activity of enhancers in medulloblastoma brain tumour 
@@ -98,8 +100,7 @@ inTadSig
 ```
 
 During the main object generation there are also available special options to 
-activate parallel computing based on usage of R multi-thread librares  
-and log2 adjustment for gene expression. The generated data subsets can be 
+activate parallel computing based on usage of R multi-thread librares and log2 adjustment for gene expression. The generated data subsets can be 
 accessed using specific call functions on the object i.e. *signals* or *exprs*. 
 
 Notably, the main object can be also loaded from the text files representing 
@@ -108,11 +109,11 @@ function for more details.
 
 # Main data analysis using TADs
 
-General first from gene expression counts matrix filtering with non- or low expressed genes. However if this counts were not filtered before starting the  InTAD analysis it's possible to adjust gene expression limits using function *filterGeneExpr*. This function provides parameters to control 
+The usage of input gene expression counts matrix assumes filtering of non- or low expressed genes. However if these counts were not filtered before starting the  InTAD analysis it's possible to adjust gene expression limits using function *filterGeneExpr*. This function provides parameters to control 
 minimum gene expression and type. There is additionally a special option to 
 compute gene expression distribution based on usage of `r CRANpkg("mclust")` 
 package in order to find suitable minimum gene expression cut limit. 
-Here's example how to activate this:
+Here's example how to use this procedure:
 
 ```{r filter-genes,  warning=FALSE}
 # filter gene expression
@@ -166,12 +167,38 @@ correlation effect limits (i.e. p-val < 0.01, positive correlation only).
 # Integration of chromatin loops
 
 Another clear approach to find contacts between genes and epigenetic signals
-is to use direct chromatin connections, so called loops. The loops are also typically derived from HiC data and there are well-known tools that allow to perform this (e.g. [FitHiC](https://ay-lab.github.io/fithic/)).
+is to use direct chromatin connections, so called loops. The loops are typically derived from HiC data and there are well-known tools that allow to perform this (e.g. [FitHiC](https://ay-lab.github.io/fithic/) or [HiCCUPS](https://github.com/aidenlab/juicer/wiki/HiCCUPS)).
 
-![Typical example of chromatin loops visualisation from IGV showing connection of medulloblastoma tumor specific enhancers to genes. The loops are derived from IMR90 HiC data.](figures/loops_image.png) 
+![An example of chromatin loops visualisation from IGV showing connection of medulloblastoma tumor specific enhancers to genes. The loops are derived from IMR90 HiC data.](figures/loops_image.png) 
 
-InTAD starting from version 1.9.1 also allows to integrate this result. Main functions to perform this task are  *combineWithLoops* and *findCorFromLoops*.
+InTAD starting from version 1.9.1 also allows to use HiC loops for the analysis. Main functions to perform this task are  *combineWithLoops* and *findCorFromLoops*.
 
+To demonstrate this approach InTAD includes an example subset of loops derived from [IMR90 cells](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525). This loops data.frame has a specific format where the first 6 columns represent genomic regions for both loop anchors:  *(chr1,start1,end1,chr2,start2,end2)*:
+```{r loopsDf,  warning=FALSE}
+loopsDfSel[1:4,1:6]
+```
+The loaded loops are applied to find connections between genes and signals using function *combineWithLoops*. By default 6-column loops format is expected, but the function also supports 4-column format where for the loop anchors only middle positions are provided (as in [FitHiC](https://ay-lab.github.io/fithic/) output): *(chr1,middlePos1,chr2,middlePos2)* . 
+
+Howerer in this case loop fragment length is also required and using the variable *fragmentLength* allows to activate this format. In addition  other parameters (e.g. transcription start site width, extension of the loops) can be controlled to increase the sensitivity. 
+
+In result the function reports how many connections are detected to be supported by loops and saves them within the returned InTAD object:
+```{r loopsDf2,  warning=FALSE}
+inTadSig <- combineWithLoops(inTadSig, loopsDfSel)
+```
+
+In this particular example only 1 connection between gene and enhancer is found. To find if there are correlations between detected connected signal-gene pairs the function *fincCorFromLoops* is applied. It has a list of options similar to corresponding function *findCorrelation* for usage of TADs (e.g. correlation method, adjusted p-value):
+
+```{r loopsDf3,  warning=FALSE}
+loopEag <- findCorFromLoops(inTadSig,method = "spearman")
+```
+
+Final result also has format similar to representation of correlations between genes and enhancers within TADs. The only difference is that the loops supporting found connection are included:
+
+```{r loopsDf4,  warning=FALSE}
+loopEag
+```
+
+In general, the focus on loops allows to increase the specificity of the detected connections between signals and genes in order to find possible perspective targets for further investigation. However, ideally it should be applied on HiC data derived from the same research target materials (e.g. same tumor type), while TADs from other sources could be used due to their stability. 
 
 # Visualization 
 

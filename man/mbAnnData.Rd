@@ -3,7 +3,7 @@
 \docType{data}
 \name{mbAnnData}
 \alias{mbAnnData}
-\title{Data frame containing information about sampless}
+\title{Data frame containing information about samples}
 \format{a data.frame object}
 \usage{
 mbAnnData

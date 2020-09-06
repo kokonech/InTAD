@@ -78,6 +78,11 @@ test_that("check intad selMaxTadOvlp option", {
     data("mbSamplesRPKM")
     data("txsSel")
 
+    # adjust enhancers to initial selection
+    targ <- findOverlaps(enhSelGR, GRanges("chr15:26003055-26976587"))
+    enhSelGR <- enhSelGR[queryHits(targ)]
+    enhSel <- enhSel[as.character(enhSelGR),]
+
     # novel enhnacer overlapping 2 tads
     # std tad chr15:25728907-27128907, close tad chr15:23608559-25368907
     novEnh <- "chr15:25367907-25738907"
@@ -120,6 +125,23 @@ test_that("check intad effect of no enhancers and TADs", {
 
 })
 
+
+test_that("test loops usage", {
+    data("mbSelEnhSignals")
+    data("enhSelCoords")
+    data("mbSamplesRPKM")
+    data("txsSel")
+    
+
+    inTadSig <- newSigInTAD(enhSel, enhSelGR, rpkmCountsSel, txsSel)
+    inTadSig <- combineWithLoops(inTadSig,loopsDfSel)
+    res <- findCorFromLoops(inTadSig,method = "spearman")
+
+    expect_equal( nrow(res) , 1)
+    expect_equal( res[ 1,"name" ] ,"GABRA5")
+    expect_equal( res[ 1,"cor" ] , 0.6123077,tolerance=1e-6)
+
+})
 
 
 

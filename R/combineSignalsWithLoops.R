@@ -158,6 +158,12 @@ findCorFromLoops <- function(object, method = "pearson", adj.pval = FALSE ) {
     stop("No signals and genes are connected via loops!
          Use combineWithLoops()  function.")
 
+  if ((length(object@loopConnections)  < 3) & (adj.pval)) {
+    warning("Number of signal-genes connection is too small
+         for adjustment of p-value. Option is skipped.")
+    adj.pval = FALSE
+  }
+
   combList <- object@loopConnections
   selLoopsDf <- object@loopsDf
 
