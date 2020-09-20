@@ -62,6 +62,10 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
     sigCons <- object@signalConnections
     txs <- rowRanges(object@sigMAE[["exprs"]])
 
+    if (sum(exprs(object)) == 0)
+      stop("No genes expressed found : full expr. matrix sum equals zero!
+           Check it via exprs() function for details.")
+
     # this null filtering was already performed in previous step
     allIdGnX <- sigCons[!sapply(sigCons, is.null)]
     allIdGnY <- allIdGnX[sapply(allIdGnX, function(x) dim(x)[1]) > 0]

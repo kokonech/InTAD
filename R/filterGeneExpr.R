@@ -117,6 +117,10 @@ filterGeneExpr <- function(obj, cutVal = 0, geneType = NA,
     #obj@exprs <- RNA
     #obj@geneCoords <- txs
 
+    if (nrow(RNA)  == 0)
+      warning("All genes are filtered! Check exprs() matrix for details.")
+
+
     exprsInitial <- experiments(obj@sigMAE)[["exprs"]]
     experiments(obj@sigMAE)[["exprs"]] <- exprsInitial[rownames(RNA),]
 
