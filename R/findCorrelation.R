@@ -84,6 +84,17 @@ findCorrelation <- function(object, method = "pearson", adj.pval = FALSE,
     }
 
     allRes <- lapply(allRes, function(x) na.omit(x))
+                     
+    library(plyr)
+    for(i in seq_len(length(allRes)))
+    {
+       allRes[[i]] <- na.omit(allRes[[i]])
+    }
+  
+    for(i in seq_len(length(allRes)))
+    {
+       compact(allRes[i])
+    }
 
     allX <- list()
     for(i in seq_len(length(allRes))) {
